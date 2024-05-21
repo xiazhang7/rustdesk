@@ -2,9 +2,6 @@ if (is_osx) view.windowBlurbehind = #light;
 stdout.println("current platform:", OS);
 stdout.println("is_xfce: ", is_xfce);
 
-// html min-width, min-height not working on mac, below works for all
-view.windowMinSize = (scaleIt(250), scaleIt(150));
-
 var app;
 var tmp = handler.get_connect_status();
 var connect_status = tmp[0];
