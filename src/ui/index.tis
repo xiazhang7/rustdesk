@@ -571,6 +571,7 @@ class App: Reactor.Component
                     {!system_error && handler.current_is_wayland() ? <ModifyDefaultLogin /> : ""}
                     <ConnectStatus @{this.connect_status} />
                 </div>
+                <div #overlay style="position: absolute;size:*;background:black;opacity:0.5;display:none" />
             </div>;
     }
 
