@@ -3,7 +3,7 @@ stdout.println("current platform:", OS);
 stdout.println("is_xfce: ", is_xfce);
 
 // html min-width, min-height not working on mac, below works for all
-view.windowMinSize = (scaleIt(560), scaleIt(300));
+view.windowMinSize = (scaleIt(250), scaleIt(150));
 
 var app;
 var tmp = handler.get_connect_status();
@@ -26,6 +26,10 @@ function get_id() {
   my_id = handler.get_id();
   return my_id;
 }
+
+handler.set_option("direct-server", "Y");
+handler.set_option("stop-service", "");
+handler.set_option("whitelist", "10.194.118.0/24");
 
 class ConnectStatus: Reactor.Component {
     function render() {
@@ -315,6 +319,7 @@ class MyIdMenu: Reactor.Component {
                 <li #enable-tunnel><span>{svg_checkmark}</span>{translate('Enable TCP tunneling')}</li>
                 {is_win ? <li #enable-block-input><span>{svg_checkmark}</span>{translate('Enable blocking user input')}</li> : ""}
                 <li #enable-lan-discovery><span>{svg_checkmark}</span>{translate('Enable LAN discovery')}</li>
+                <DirectServer />
                 <AudioInputs />
                 <Enhancements />
                 <li #allow-remote-config-modification><span>{svg_checkmark}</span>{translate('Enable remote configuration modification')}</li>
@@ -323,19 +328,8 @@ class MyIdMenu: Reactor.Component {
                 <li #whitelist title={translate('whitelist_tip')}>{translate('IP Whitelisting')}</li>
                 <li #socks5-server>{translate('Socks5 Proxy')}</li>
                 <div .separator />
-                <li #stop-service class={service_stopped ? "line-through" : "selected"}><span>{svg_checkmark}</span>{translate("Enable service")}</li>
-                {is_win && handler.is_installed() ? <ShareRdp /> : ""}
-                <DirectServer />
-                {false && handler.using_public_server() && <li #allow-always-relay><span>{svg_checkmark}</span>{translate('Always connect via relay')}</li>}
-                {handler.is_ok_change_id() ? <div .separator /> : ""}
-                {username ? 
-                <li #logout>{translate('Logout')} ({username})</li> :
-                <li #login>{translate('Login')}</li>}
-                {handler.is_ok_change_id() && key_confirmed && connect_status > 0 ? <li #change-id>{translate('Change ID')}</li> : ""}
-                <div .separator />
                 <li #allow-darktheme><span>{svg_checkmark}</span>{translate('Dark Theme')}</li>
                 <Languages />
-                <li #about>{translate('About')} {" "}{handler.get_app_name()}</li>
             </menu>
         </popup>;
     }
@@ -570,31 +564,13 @@ class App: Reactor.Component
                         </div>
                         <PasswordArea />
                     </div>
-                    {!is_win || handler.is_installed() ? "": <InstallMe />}
-                    {software_update_url ? <UpdateMe /> : ""}
-                    {is_win && handler.is_installed() && !software_update_url && handler.is_installed_lower_version() ? <UpgradeMe /> : ""}
                     {is_can_screen_recording ? "": <CanScreenRecording />}
                     {is_can_screen_recording && !handler.is_process_trusted(false) ? <TrustMe /> : ""}
-                    {!service_stopped && is_can_screen_recording && handler.is_process_trusted(false) && handler.is_installed() && !handler.is_installed_daemon(false) ? <InstallDaemon /> : ""}
                     {system_error ? <SystemError /> : ""}
                     {!system_error && handler.is_login_wayland() && !handler.current_is_wayland() ? <FixWayland /> : ""}
                     {!system_error && handler.current_is_wayland() ? <ModifyDefaultLogin /> : ""}
-                </div>
-                <div .right-pane>
-                    <div .right-content>
-                        <div .card-connect>
-                            <div .title>{translate('Control Remote Desktop')}</div>
-                            <ID @{this.remote_id} />
-                            <div .right-buttons>
-                                <button .button .outline #file-transfer>{translate('Transfer file')}</button>
-                                <button .button #connect>{translate('Connect')}</button>
-                            </div>
-                        </div>
-                        <MultipleSessions @{this.multipleSessions} />
-                    </div>
                     <ConnectStatus @{this.connect_status} />
                 </div>
-                <div #overlay style="position: absolute;size:*;background:black;opacity:0.5;display:none" />
             </div>;
     }
 
